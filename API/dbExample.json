@@ -1,0 +1,106 @@
+{
+  "name": "MyDatabase",
+  "tables": [
+    {
+      "id": "t001",
+      "name": "Users",
+      "columns": [
+        {
+          "id": "c001",
+          "name": "UserId",
+          "type": "Integer",
+          "validation": {
+            "isRequired": true,
+            "minValue": 1
+          }
+        },
+        {
+          "id": "c002",
+          "name": "Username",
+          "type": "String",
+          "validation": {
+            "isRequired": true,
+            "maxLength": 50
+          }
+        },
+        {
+          "id": "c003",
+          "name": "Age",
+          "type": "Integer",
+          "validation": {
+            "minValue": 0,
+            "maxValue": 120
+          }
+        }
+      ],
+      "rows": [
+        {
+          "id": "r001",
+          "cells": {
+            "c001": 1,
+            "c002": "Alice",
+            "c003": 30
+          }
+        },
+        {
+          "id": "r002",
+          "cells": {
+            "c001": 2,
+            "c002": "Bob",
+            "c003": 25
+          }
+        }
+      ]
+    },
+    {
+      "id": "t002",
+      "name": "Products",
+      "columns": [
+        {
+          "id": "c004",
+          "name": "ProductId",
+          "type": "Integer",
+          "validation": {
+            "isRequired": true,
+            "minValue": 1
+          }
+        },
+        {
+          "id": "c005",
+          "name": "ProductName",
+          "type": "String",
+          "validation": {
+            "isRequired": true,
+            "maxLength": 100
+          }
+        },
+        {
+          "id": "c006",
+          "name": "Price",
+          "type": "Real",
+          "validation": {
+            "minValue": 0.0
+          }
+        }
+      ],
+      "rows": [
+        {
+          "id": "r003",
+          "cells": {
+            "c004": 101,
+            "c005": "Laptop",
+            "c006": 799.99
+          }
+        },
+        {
+          "id": "r004",
+          "cells": {
+            "c004": 102,
+            "c005": "Smartphone",
+            "c006": 699.99
+          }
+        }
+      ]
+    }
+  ]
+}
