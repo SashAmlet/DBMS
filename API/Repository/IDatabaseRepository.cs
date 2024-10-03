@@ -4,8 +4,8 @@ namespace API.Repository
 {
     public interface IDatabaseRepository
     {
-        void SaveDatabase(Database database);
-        Database LoadDatabase(string databaseName);
+        void CreateDatabase(Database database);
+        Database ReadDatabase(string databaseName);
         void UpdateDatabase(Database database);
         void DeleteDatabase(string databaseName);
     }

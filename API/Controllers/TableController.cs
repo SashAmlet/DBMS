@@ -25,13 +25,13 @@ namespace API.Controllers
             {
                 var table = new Table
                 {
-                    Id = Guid.NewGuid(),
+                    Id = dto.TableId,
                     Name = dto.TableName,
                     Columns = dto.Columns.Select(c => new Column
                     {
                         Id = c.Id,
-                        Name = c.ColumnName,
-                        Type = c.ColumnType,
+                        Name = c.Name,
+                        Type = c.Type,
                         DisplayIndex = c.DisplayIndex,
                         IsNullable = c.IsNullable,
                     }).ToList(),
@@ -47,7 +47,7 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("{tableName}")]
+        [HttpGet("{tableId}")]
         public IActionResult GetTable(string databaseName, Guid tableId)
         {
             try
@@ -76,8 +76,8 @@ namespace API.Controllers
                     Columns = dto.Columns.Select(c => new Column
                     {
                         Id = c.Id,
-                        Name = c.ColumnName,
-                        Type = c.ColumnType,
+                        Name = c.Name,
+                        Type = c.Type,
                         DisplayIndex = c.DisplayIndex,
                         IsNullable = c.IsNullable,
                     }).ToList(),
@@ -100,7 +100,7 @@ namespace API.Controllers
         }
 
 
-        [HttpDelete("{tableName}")]
+        [HttpDelete("{tableId}")]
         public IActionResult DeleteTable(string databaseName, Guid tableId)
         {
             try

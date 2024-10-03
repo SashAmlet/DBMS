@@ -18,7 +18,7 @@ namespace API.Services
         public void CreateDatabase(Database db)
         {
             
-            _databaseRepository.SaveDatabase(db);
+            _databaseRepository.CreateDatabase(db);
 
             if (! _cache.ContainsKey(db.Name))
             {
@@ -31,7 +31,7 @@ namespace API.Services
         {
             if (!_cache.TryGetValue(databaseName, out var database))
             {
-                database = _databaseRepository.LoadDatabase(databaseName);
+                database = _databaseRepository.ReadDatabase(databaseName);
                 if (database != null)
                     _cache[databaseName] = database;
             }

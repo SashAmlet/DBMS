@@ -16,7 +16,7 @@ namespace API.Repository
             }
         }
 
-        public void SaveDatabase(Database database)
+        public void CreateDatabase(Database database)
         {
             string filePath = Path.Combine(_dbDirectory, $"{database.Name}.json");
 
@@ -29,7 +29,7 @@ namespace API.Repository
             File.WriteAllText(filePath, jsonData);
         }
 
-        public Database LoadDatabase(string databaseName)
+        public Database ReadDatabase(string databaseName)
         {
             var filePath = Path.Combine(_dbDirectory, $"{databaseName}.json");
             if (!File.Exists(filePath))

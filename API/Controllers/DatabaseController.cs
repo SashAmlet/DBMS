@@ -69,8 +69,8 @@ namespace API.Controllers
                         Columns = t.Columns.Select(c=> new Column
                         {
                             Id = c.Id,
-                            Name = c.ColumnName,
-                            Type = c.ColumnType,
+                            Name = c.Name,
+                            Type = c.Type,
                             DisplayIndex = c.DisplayIndex,
                             IsNullable = c.IsNullable,
                         }).ToList(),
