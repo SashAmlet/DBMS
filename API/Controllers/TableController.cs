@@ -17,7 +17,6 @@ namespace API.Controllers
             _tableService = tableService;
         }
 
-
         [HttpPost]
         public IActionResult CreateTable(string databaseName, [FromBody] CreateTableDTO dto)
         {
@@ -113,5 +112,37 @@ namespace API.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpPut("{tableId}/remove-duplicates")]
+        public IActionResult RemoveDuplicateRows(string databaseName, Guid tableId)
+        {
+            try
+            {
+                var table = _tableService.GetTable(databaseName, tableId);
+                if (table == null)
+                    return NotFound($"Table '{tableId}' not found in database '{databaseName}'.");
+
+                // Group the elements by RowNum and select only the first element from each group
+                var uniqueCells = table.Cells
+                        .GroupBy(cell => cell.RowNum)
+                        .Select(group => group.OrderBy(cell => cell.ColumnId).ToList())
+                        .GroupBy(row => string.Join(";", row.Select(cell => cell.Value)))
+                        .Select(group => group.First())
+                        .SelectMany(row => row)
+                        .ToList();
+
+                table.Cells = uniqueCells;
+
+                _tableService.UpdateTable(databaseName, tableId, table);
+
+                return Ok(table);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+
+        }
+
     }
 }

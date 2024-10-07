@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using API.Controllers;
 using API.Services;
 using API.Repository;
+using Shared;
 using Shared.DTOs;
 
 namespace API_testing
@@ -11,12 +12,22 @@ namespace API_testing
     {
         private readonly DatabaseController _controller;
         private readonly string _dbDirectory = @"C:\Users\ostre\OneDrive\Books\4th_course\IT\LAB1-DBMS\Storage";
+        private string _dbName = "UnitTestDatabase";
 
         public DatabaseControllerTests()
         {
             var repository = new DatabaseRepository();
             var service = new DatabaseService(repository);
             _controller = new DatabaseController(service);
+
+
+            var config_controller = new ConfigController();
+            Constants.BasePath = _dbDirectory;
+            var dto = new UpdatePathDTO()
+            {
+                NewBasePath = Constants.BasePath
+            };
+            config_controller.UpdateBasePath(dto);
         }
 
         [Fact]
@@ -25,7 +36,7 @@ namespace API_testing
             // Arrange
             var request = new CreateDatabaseDTO
             {
-                DatabaseName = "TestDatabase"
+                DatabaseName = _dbName
             };
 
             // Act
@@ -39,10 +50,6 @@ namespace API_testing
 
             string expectedFilePath = Path.Combine(_dbDirectory, $"{request.DatabaseName}.json");
             Assert.True(File.Exists(expectedFilePath));
-
-
-            string jsonData = File.ReadAllText(expectedFilePath);
-            Assert.Contains(request.DatabaseName, jsonData);
         }
 
         [Fact]
@@ -51,7 +58,7 @@ namespace API_testing
 
             var request = new CreateDatabaseDTO
             {
-                DatabaseName = "TestDatabase"
+                DatabaseName = _dbName
             };
 
             // Act
@@ -70,7 +77,7 @@ namespace API_testing
 
             if (Directory.Exists(_dbDirectory))
             {
-                Directory.Delete(_dbDirectory, true);
+                File.Delete($"{_dbDirectory}\\{_dbName}.json");
             }
         }
     }

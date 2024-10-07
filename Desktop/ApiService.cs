@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.Design;
+using System.Xml.Linq;
 using Newtonsoft.Json;
 using Shared;
 using Shared.DTOs;
@@ -19,7 +20,36 @@ namespace Desktop
         {
             _httpClient = new HttpClient();
         }
+        public async Task UpdateBasePathAsync(UpdatePathDTO dto)
+        {
+            string url = Path.Combine(Constants.ApiUrl, $"api/Config");
+            var jsonData = JsonConvert.SerializeObject(dto);
+            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
+
+            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+
+                throw new Exception($"Failed to update path to directory: {errorMessage}");
+            }
+        }
+        public async Task RemoveDuplicateRowsAsync(string dbName, Guid tbId)
+        {
+            string url = Path.Combine(Constants.ApiUrl, $"api/databases/{dbName}/tables/{tbId}/remove-duplicates");
+
+
+            HttpResponseMessage response = await _httpClient.PutAsync(url, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+
+                throw new Exception($"Failed to remove duplicate rows: {errorMessage}");
+            }
+        }
 
         public async Task CreateDatabaseAsync(CreateDatabaseDTO dto)
         {
@@ -65,6 +95,25 @@ namespace Desktop
             }
         }
 
+        public async Task<TableDTO?> GetTableAsync(string dbName, Guid tableId)
+        {
+            string url = Path.Combine(Constants.ApiUrl, $"api/databases/{dbName}/tables/{tableId}");
+
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                TableDTO? table = JsonConvert.DeserializeObject<TableDTO>(jsonResponse);
+
+                return table;
+            }
+            else
+            {
+                throw new Exception($"Failed to get table: {response.ReasonPhrase}");
+            }
+        }
 
         public async Task CreateTableAsync(string dbName, CreateTableDTO dto)
         {

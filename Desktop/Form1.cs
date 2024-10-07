@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Linq;
 using static System.ComponentModel.Design.ObjectSelectorEditor;
 using System.Runtime.CompilerServices;
+using System.Globalization;
 
 namespace Desktop
 {
@@ -96,9 +97,11 @@ namespace Desktop
             tableContextMenu = new ContextMenuStrip();
             //ToolStripMenuItem renameTableMenuItem = new ToolStripMenuItem("Rename Table", null, OnRenameTableClick);
             ToolStripMenuItem updateTableMenuItem = new ToolStripMenuItem("Update Table", null, OnUpdateTableClick);
+            ToolStripMenuItem removeDuplicateRowsMenuItem = new ToolStripMenuItem("Remove Duplicate Rows", null, OnRemoveDuplicateRows);
             ToolStripMenuItem deleteTableMenuItem = new ToolStripMenuItem("Delete Table", null, OnDeleteTableClick);
             //tableContextMenu.Items.Add(renameTableMenuItem);
             tableContextMenu.Items.Add(updateTableMenuItem);
+            tableContextMenu.Items.Add(removeDuplicateRowsMenuItem);
             tableContextMenu.Items.Add(deleteTableMenuItem);
 
             // 
@@ -137,16 +140,16 @@ namespace Desktop
 
 
         /*      ACTIONS     */
-        private void OnSelectDirectoryClick(object sender, EventArgs e)
+        private async void OnSelectDirectoryClick(object sender, EventArgs e)
         {
             try
             {
-                SelectDirectory();
+                await SelectDirectory();
                 var dbNames = GetJsonFileNames(Constants.BasePath);
 
                 foreach (var dbName in dbNames)
                 {
-                    OpenDatabase(dbName);
+                    await OpenDatabase(dbName);
                 }
                 AppendMessageToRichTextBox("The directory has been opened successfully.");
             }
@@ -180,6 +183,11 @@ namespace Desktop
 
                     try
                     {
+                        if (Constants.BasePath == string.Empty)
+                        {
+                            throw new Exception("Specify the path to the database storage directory.");
+                        }
+
                         await apiService.CreateDatabaseAsync(createDbDTO);
 
                         AppendMessageToRichTextBox("The database has been created successfully.");
@@ -187,6 +195,7 @@ namespace Desktop
                     catch (Exception ex)
                     {
                         AppendMessageToRichTextBox($"Error creating database: {ex.Message}");
+                        return;
                     }
                 }
             }
@@ -220,8 +229,6 @@ namespace Desktop
 
         }
         #endregion
-
-
 
         #region TABLE ACTIONS
 
@@ -288,6 +295,53 @@ namespace Desktop
                     dataGridView.Rows.Add(rowData);
                 }
             }
+        }
+
+        private async void OnRemoveDuplicateRows(object sender, EventArgs e)
+        {
+            ClearAndLockDataGridView();
+            ApiService apiService = new ApiService();
+
+            TreeNode selectedNode = treeView.SelectedNode;
+            TreeNode parentNode = selectedNode.Parent;
+            if (selectedNode != null && parentNode != null && selectedNode.Tag is TableDTO table && parentNode.Tag is DatabaseDTO db)
+            {
+                DialogResult result = MessageBox.Show($"Remove duplicate rows in the {selectedNode.Text}?", "Remove duplicate rows", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    /*try
+                    {
+                        await apiService.RemoveDuplicateRowsAsync(parentNode.Text, table.Id);
+                        treeView.Nodes.Remove(selectedNode);
+                        AppendMessageToRichTextBox($"Table {selectedNode.Text} has been deleted from {parentNode.Text}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendMessageToRichTextBox($"Error removing duplicate rows in table: {ex.Message}");
+                    }*/
+                    try
+                    {
+                        await apiService.RemoveDuplicateRowsAsync(db.Name, table.Id);
+
+
+                        // add node to TreeView
+                        TableDTO? new_table = await apiService.GetTableAsync(db.Name, table.Id);
+                        if (new_table is null)
+                        {
+                            throw new Exception("Null returned instead of table");
+                        }
+
+                        activeTreeNode.Tag = new_table;
+                        AppendMessageToRichTextBox($"Duplicate lines in {table.Name} have been successfully removed.");
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendMessageToRichTextBox($"Error removing duplicate rows in table: {ex.Message}");
+                    }
+                }
+            }
+
         }
 
         #region CREATE
@@ -560,6 +614,35 @@ namespace Desktop
                     }
                     break;
 
+                case Constants.DataType.Time:
+                    if (!TimeSpan.TryParseExact(value.ToString(), "hh\\:mm\\:ss", CultureInfo.InvariantCulture, out TimeSpan timeValue))
+                    {
+                        throw new Exception($"Cell ({column}, {row}) - Invalid time format. Expected format is HH:MM:SS.");
+                    }
+                    break;
+
+                case Constants.DataType.TimeLvl:
+                    // Split a string by the "-" character
+                    var timeRangeParts = value.ToString().Split('-');
+                    if (timeRangeParts.Length != 2)
+                    {
+                        throw new Exception($"Cell ({column}, {row}) - Invalid time range format. Expected format is HH:MM:SS - HH:MM:SS.");
+                    }
+
+                    // Trying to parse the start and end of a time interval
+                    if (!TimeSpan.TryParseExact(timeRangeParts[0], "hh\\:mm\\:ss", CultureInfo.InvariantCulture, out TimeSpan startTime) ||
+                        !TimeSpan.TryParseExact(timeRangeParts[1], "hh\\:mm\\:ss", CultureInfo.InvariantCulture, out TimeSpan endTime))
+                    {
+                        throw new Exception($"Cell ({column}, {row}) - Invalid time range format. Both start and end times must be in HH:MM:SS format.");
+                    }
+
+                    // Checking if the start is less than the end
+                    if (startTime >= endTime)
+                    {
+                        throw new Exception($"Cell ({column}, {row}) - Invalid time range in row. Start time must be earlier than end time.");
+                    }
+                    break;
+
                 default:
                     errorMessage = "Unsupported data type.";
                     return false;
@@ -638,7 +721,7 @@ namespace Desktop
         {
             richTextBox.Clear();
         }
-        private async void OpenDatabase(string dbName)
+        private async Task OpenDatabase(string dbName)
         {
             ApiService apiService = new ApiService();
 
@@ -687,8 +770,10 @@ namespace Desktop
             
         }
 
-        private void SelectDirectory()
+        private async Task SelectDirectory()
         {
+            var apiService = new ApiService();
+
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
                 folderDialog.Description = "Select a directory to save the database to";
@@ -696,6 +781,12 @@ namespace Desktop
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
                     Constants.BasePath = $@"{folderDialog.SelectedPath}";
+
+                    var dto = new UpdatePathDTO()
+                    {
+                        NewBasePath = Constants.BasePath
+                    };
+                    await apiService.UpdateBasePathAsync(dto);
                 }
             }
         }

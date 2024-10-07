@@ -6,19 +6,9 @@ namespace API.Repository
 {
     public class DatabaseRepository : IDatabaseRepository
     {
-        private readonly string _dbDirectory = Constants.BasePath;
-
-        public DatabaseRepository()
-        {
-            if (!Directory.Exists(_dbDirectory))
-            {
-                Directory.CreateDirectory(_dbDirectory);
-            }
-        }
-
         public void CreateDatabase(Database database)
         {
-            string filePath = Path.Combine(_dbDirectory, $"{database.Name}.json");
+            string filePath = Path.Combine(Constants.BasePath, $"{database.Name}.json");
 
             if (File.Exists(filePath))
             {
@@ -31,7 +21,7 @@ namespace API.Repository
 
         public Database ReadDatabase(string databaseName)
         {
-            var filePath = Path.Combine(_dbDirectory, $"{databaseName}.json");
+            var filePath = Path.Combine(Constants.BasePath, $"{databaseName}.json");
             if (!File.Exists(filePath))
             {
                 return null;
@@ -43,7 +33,7 @@ namespace API.Repository
 
         public void UpdateDatabase(Database database)
         {
-            var filePath = Path.Combine(_dbDirectory, $"{database.Name}.json");
+            var filePath = Path.Combine(Constants.BasePath, $"{database.Name}.json");
 
             string jsonData = JsonSerializer.Serialize(database, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(filePath, jsonData);
@@ -51,7 +41,7 @@ namespace API.Repository
 
         public void DeleteDatabase(string databaseName)
         {
-            var filePath = Path.Combine(_dbDirectory, $"{databaseName}.json");
+            var filePath = Path.Combine(Constants.BasePath, $"{databaseName}.json");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
