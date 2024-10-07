@@ -5,10 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
+builder.Services.AddSingleton<IDatabaseRepository, DatabaseRepository>();
 
-builder.Services.AddScoped<IDatabaseService, DatabaseService>();
-builder.Services.AddScoped<ITableService, TableService>();
+builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
+builder.Services.AddSingleton<ITableService, TableService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
