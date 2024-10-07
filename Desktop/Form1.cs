@@ -259,7 +259,6 @@ namespace Desktop
                 mode = Mode.FillInTable;
 
                 ClearAndUnlockDataGridView();
-                dataGridView.RowsAdded -= DataGridView_RowsAdded;
                 this.Text = formName + $" - {table.Name}";
 
                 // Add columns to DataGridView from table structure
@@ -814,6 +813,8 @@ namespace Desktop
             mode = Mode.None;
 
             this.Text = formName;
+
+            dataGridView.RowsAdded -= DataGridView_RowsAdded;
         }
         private void ClearAndUnlockDataGridView()
         {
@@ -829,6 +830,8 @@ namespace Desktop
             dataGridView.Enabled = true;
 
             this.Text = formName;
+
+            dataGridView.RowsAdded -= DataGridView_RowsAdded;
         }
 
         private void AppendMessageToRichTextBox(string message)
