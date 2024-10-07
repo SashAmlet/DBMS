@@ -36,28 +36,7 @@ namespace Desktop
                 throw new Exception($"Failed to update path to directory: {errorMessage}");
             }
         }
-        public async Task<TableDTO> RemoveDuplicateRowsAsync(string dbName, Guid tbId)
-        {
-            string url = Path.Combine(Constants.ApiUrl, $"api/databases/{dbName}/tables/{tbId}/remove-duplicates");
 
-
-            HttpResponseMessage response = await _httpClient.PutAsync(url, null);
-
-            if (response.IsSuccessStatusCode)
-            {
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-
-                TableDTO? table = JsonConvert.DeserializeObject<TableDTO>(jsonResponse);
-
-                return table;
-            }
-            else
-            {
-                string errorMessage = await response.Content.ReadAsStringAsync();
-
-                throw new Exception($"Failed to remove duplicate rows: {errorMessage}");
-            }
-        }
 
         public async Task CreateDatabaseAsync(CreateDatabaseDTO dto)
         {
@@ -71,7 +50,6 @@ namespace Desktop
                 throw new Exception($"Failed to get database: {response.ReasonPhrase}");
             }
         }
-
         public async Task<DatabaseDTO?> GetDatabaseAsync(string dbName)
         {
             string url = Path.Combine(Constants.ApiUrl, $"api/Database/{dbName}");
@@ -91,7 +69,6 @@ namespace Desktop
                 throw new Exception($"Failed to get database: {response.ReasonPhrase}");
             }
         }
-
         public async Task DeleteDatabaseAsync(string dbName)
         {
             string url = Path.Combine(Constants.ApiUrl, $"api/Database/{dbName}");
@@ -102,6 +79,7 @@ namespace Desktop
                 throw new Exception($"Failed to delete database: {response.ReasonPhrase}");
             }
         }
+
 
         public async Task<TableDTO?> GetTableAsync(string dbName, Guid tableId)
         {
@@ -122,7 +100,6 @@ namespace Desktop
                 throw new Exception($"Failed to get table: {response.ReasonPhrase}");
             }
         }
-
         public async Task CreateTableAsync(string dbName, CreateTableDTO dto)
         {
             string url = Path.Combine(Constants.ApiUrl, $"api/databases/{dbName}/tables");
@@ -152,8 +129,6 @@ namespace Desktop
                 throw new Exception($"Failed to save table on server: {errorMessage}");
             }
         }
-
-
         public async Task DeleteTableAsync(string dbName, Guid tbId)
         {
             string url = Path.Combine(Constants.ApiUrl, $"api/databases/{dbName}/tables/{tbId}");
@@ -164,6 +139,27 @@ namespace Desktop
                 throw new Exception($"Failed to delete database: {response.ReasonPhrase}");
             }
         }
+        public async Task<TableDTO> RemoveDuplicateRowsAsync(string dbName, Guid tbId)
+        {
+            string url = Path.Combine(Constants.ApiUrl, $"api/databases/{dbName}/tables/{tbId}/remove-duplicates");
 
+
+            HttpResponseMessage response = await _httpClient.PutAsync(url, null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                TableDTO? table = JsonConvert.DeserializeObject<TableDTO>(jsonResponse);
+
+                return table;
+            }
+            else
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+
+                throw new Exception($"Failed to remove duplicate rows: {errorMessage}");
+            }
+        }
     }
 }

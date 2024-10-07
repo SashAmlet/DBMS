@@ -219,6 +219,7 @@ namespace Desktop
                     {
                         await apiService.DeleteDatabaseAsync(selectedNode.Text);
                         treeView.Nodes.Remove(selectedNode);
+                        ClearAndLockDataGridView();
                         AppendMessageToRichTextBox($"Database {selectedNode.Text} has been deleted.");
                     }
                     catch (Exception ex)
