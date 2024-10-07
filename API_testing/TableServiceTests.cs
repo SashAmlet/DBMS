@@ -9,26 +9,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using System.Xml.Linq;
 
 namespace API_testing
 {
-    public class TableControllerTests
+    public class TableServiceTests
     {
-        private readonly Mock<ITableService> _mockTableService;
-        private readonly TableController _controller;
+        private readonly Mock<IDatabaseService> _mockDatabaseService;
+        private readonly TableService _tableService; // Ваш сервис, содержащий метод RemoveDuplicateRows
 
-        public TableControllerTests()
+        public TableServiceTests()
         {
-            _mockTableService = new Mock<ITableService>();
-
-            _controller = new TableController(_mockTableService.Object);
+            _mockDatabaseService = new Mock<IDatabaseService>();
+            _tableService = new TableService(_mockDatabaseService.Object);
         }
 
         [Fact]
         public void RemoveDuplicateRows_ShouldRemoveDuplicatesAndReturnOk()
         {
             // Arrange
-            var databaseName = "TestDB";
+            var dbName = "TestDB";
             var tableId = Guid.NewGuid();
 
             var column0 = Guid.NewGuid();
@@ -66,17 +66,21 @@ namespace API_testing
                 Cells = inputCells
             };
 
-            _mockTableService.Setup(service => service.GetTable(databaseName, tableId)).Returns(table);
-            _mockTableService.Setup(service => service.UpdateTable(databaseName, tableId, It.IsAny<Table>()));
 
-            var controller = new TableController(_mockTableService.Object);
+            var database = new Database
+            {
+                Name = dbName,
+                Tables = new List<Table> { table }
+            };
+
+
+            _mockDatabaseService.Setup(ds => ds.GetDatabase(dbName))
+                .Returns(database);
 
             // Act
-            var result = controller.RemoveDuplicateRows(databaseName, tableId) as OkObjectResult;
+            var updatedTable = _tableService.RemoveDuplicateRows(dbName, tableId);
 
             // Assert
-            Assert.NotNull(result);
-            var updatedTable = result.Value as Table;
             Assert.NotNull(updatedTable);
 
             List<Cell> test_group = updatedTable.Cells.ToList();
@@ -95,7 +99,7 @@ namespace API_testing
             }
 
 
-            _mockTableService.Verify(service => service.UpdateTable(databaseName, tableId, updatedTable), Times.Once);
+            _mockDatabaseService.Verify(ds => ds.UpdateDatabase(dbName, database), Times.Once);
         }
     }
 }

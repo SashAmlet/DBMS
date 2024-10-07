@@ -9,5 +9,6 @@ namespace API.Services
         Table GetTable(string dbName, Guid tableId);
         void UpdateTable(string dbName, Guid tableId, Table table);
         void DeleteTable(string dbName, Guid tableId);
+        Table RemoveDuplicateRows(string dbName, Guid tableId);
     }
 }

@@ -45,7 +45,6 @@ namespace API.Controllers
             }
         }
 
-
         [HttpGet("{tableId}")]
         public IActionResult GetTable(string databaseName, Guid tableId)
         {
@@ -98,7 +97,6 @@ namespace API.Controllers
             }
         }
 
-
         [HttpDelete("{tableId}")]
         public IActionResult DeleteTable(string databaseName, Guid tableId)
         {
@@ -118,22 +116,7 @@ namespace API.Controllers
         {
             try
             {
-                var table = _tableService.GetTable(databaseName, tableId);
-                if (table == null)
-                    return NotFound($"Table '{tableId}' not found in database '{databaseName}'.");
-
-                // Group the elements by RowNum and select only the first element from each group
-                var uniqueCells = table.Cells
-                        .GroupBy(cell => cell.RowNum)
-                        .Select(group => group.OrderBy(cell => cell.ColumnId).ToList())
-                        .GroupBy(row => string.Join(";", row.Select(cell => cell.Value)))
-                        .Select(group => group.First())
-                        .SelectMany(row => row)
-                        .ToList();
-
-                table.Cells = uniqueCells;
-
-                _tableService.UpdateTable(databaseName, tableId, table);
+                var table = _tableService.RemoveDuplicateRows(databaseName, tableId);
 
                 return Ok(table);
             }

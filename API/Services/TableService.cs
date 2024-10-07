@@ -61,5 +61,27 @@ namespace API.Services
             database.Tables.Remove(table);
             _databaseService.UpdateDatabase(dbName, database);
         }
+    
+        public Table RemoveDuplicateRows(string dbName, Guid tableId)
+        {
+            var table = GetTable(dbName, tableId);
+            if (table == null)
+                throw new Exception($"Table '{tableId}' not found in database '{dbName}'.");
+
+            // Group the elements by RowNum and select only the first element from each group
+            var uniqueCells = table.Cells
+                    .GroupBy(cell => cell.RowNum)
+                    .Select(group => group.OrderBy(cell => cell.ColumnId).ToList())
+                    .GroupBy(row => string.Join(";", row.Select(cell => cell.Value)))
+                    .Select(group => group.First())
+                    .SelectMany(row => row)
+                    .ToList();
+
+            table.Cells = uniqueCells;
+
+            UpdateTable(dbName, tableId, table);
+
+            return table;
+        }
     }
 }

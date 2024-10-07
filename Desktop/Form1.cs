@@ -18,6 +18,7 @@ namespace Desktop
         private DataGridView dataGridView;
         private ContextMenuStrip dbContextMenu;
         private ContextMenuStrip tableContextMenu;
+        /*is used purely to create or fill in the table when mouse focus leaves the TreeView*/
         private TreeNode activeTreeNode;
         private Mode mode = Mode.None;
         private string formName = "Database Manager";
@@ -310,29 +311,19 @@ namespace Desktop
 
                 if (result == DialogResult.Yes)
                 {
-                    /*try
-                    {
-                        await apiService.RemoveDuplicateRowsAsync(parentNode.Text, table.Id);
-                        treeView.Nodes.Remove(selectedNode);
-                        AppendMessageToRichTextBox($"Table {selectedNode.Text} has been deleted from {parentNode.Text}.");
-                    }
-                    catch (Exception ex)
-                    {
-                        AppendMessageToRichTextBox($"Error removing duplicate rows in table: {ex.Message}");
-                    }*/
                     try
                     {
-                        await apiService.RemoveDuplicateRowsAsync(db.Name, table.Id);
+                        TableDTO? new_table = await apiService.RemoveDuplicateRowsAsync(db.Name, table.Id);
 
 
                         // add node to TreeView
-                        TableDTO? new_table = await apiService.GetTableAsync(db.Name, table.Id);
+
                         if (new_table is null)
                         {
                             throw new Exception("Null returned instead of table");
                         }
 
-                        activeTreeNode.Tag = new_table;
+                        selectedNode.Tag = new_table;
                         AppendMessageToRichTextBox($"Duplicate lines in {table.Name} have been successfully removed.");
                     }
                     catch (Exception ex)

@@ -26,7 +26,6 @@ namespace API.Services
             }
         }
 
-
         public Database GetDatabase(string databaseName)
         {
             if (!_cache.TryGetValue(databaseName, out var database))
