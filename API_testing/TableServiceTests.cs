@@ -16,7 +16,7 @@ namespace API_testing
     public class TableServiceTests
     {
         private readonly Mock<IDatabaseService> _mockDatabaseService;
-        private readonly TableService _tableService; // Ваш сервис, содержащий метод RemoveDuplicateRows
+        private readonly TableService _tableService;
 
         public TableServiceTests()
         {
