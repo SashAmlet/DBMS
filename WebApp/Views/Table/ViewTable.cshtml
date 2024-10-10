@@ -1,0 +1,101 @@
+﻿@model WebApp.Models.Table
+
+@{
+    ViewData["Title"] = Model.Name + " - Table Edit";
+}
+
+<h1>@Model.Name</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="ViewTable" asp-route-databaseName="@ViewData["databaseName"]" asp-route-Id="@Model.Id">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        @foreach (var column in Model.Columns)
+                        {
+                            <th>@column.Name</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Cells.Any())
+                    {
+                        var groupedRows = Model.Cells.GroupBy(c => c.RowNum);
+                        var rowIndex = 0;
+
+                        foreach (var rowGroup in groupedRows)
+                        {
+                            <tr>
+                                @foreach (var column in Model.Columns)
+                                {
+                                    var cell = rowGroup.FirstOrDefault(c => c.ColumnId == column.Id);
+                                    var cellIndex = rowIndex * Model.Columns.Count() + column.DisplayIndex;
+                                    <td>
+                                        <input type="text" class="form-control"
+                                               name="cells[@cellIndex].Value"
+                                               value="@cell?.Value" />
+                                        <input type="hidden" name="cells[@cellIndex].RowNum" value="@cell?.RowNum" />
+                                        <input type="hidden" name="cells[@cellIndex].ColumnId" value="@column.Id" />
+                                    </td>
+                                }
+                            </tr>
+                            rowIndex++;
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div class="form-group">
+                <button type="button" id="addRowButton" class="btn btn-secondary">Add Row</button>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+    <script>
+        let rowIndex = @Model.Cells.Count() / @Model.Columns.Count();
+
+        document.getElementById("addRowButton").onclick = function () {
+            const tableBody = document.querySelector("table tbody");
+            const row = document.createElement("tr");
+
+        @foreach (var column in Model.Columns)
+        {
+            <text>
+                    row.innerHTML += `
+                            <td>
+                                <input type="text" class="form-control"
+                                    name="cells[${rowIndex * @Model.Columns.Count() + @column.DisplayIndex}].Value" value="" />
+                                <input type="hidden" name="cells[${rowIndex * @Model.Columns.Count() + @column.DisplayIndex}].RowNum" value="${rowIndex}" />
+                                <input type="hidden" name="cells[${rowIndex * @Model.Columns.Count() + @column.DisplayIndex}].ColumnId" value="@column.Id" />
+                            </td>
+                        `;
+            </text>
+        }
+
+                tableBody.appendChild(row);
+            rowIndex++;
+        };
+    </script>
+
+}
+

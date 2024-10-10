@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{724D1C5C-3AB4-4352-B569-62F161F2B8B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{724D1C5C-3AB4-4352-B569-62F161F2B8B2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3F21A595-D7B8-43C2-A03C-7CB57032328F} = {3F21A595-D7B8-43C2-A03C-7CB57032328F}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API_testing", "API_testing\API_testing.csproj", "{D2B5AA9A-770A-468F-86B2-05F6FDBD74A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API_testing", "API_testing\API_testing.csproj", "{D2B5AA9A-770A-468F-86B2-05F6FDBD74A3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{724D1C5C-3AB4-4352-B569-62F161F2B8B2} = {724D1C5C-3AB4-4352-B569-62F161F2B8B2}
 	EndProjectSection
@@ -18,12 +18,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.txt = README.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desktop", "Desktop\Desktop.csproj", "{7F61863C-A3C3-4633-90E6-926E830D2A17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Desktop", "Desktop\Desktop.csproj", "{7F61863C-A3C3-4633-90E6-926E830D2A17}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3F21A595-D7B8-43C2-A03C-7CB57032328F} = {3F21A595-D7B8-43C2-A03C-7CB57032328F}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{3F21A595-D7B8-43C2-A03C-7CB57032328F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{3F21A595-D7B8-43C2-A03C-7CB57032328F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csproj", "{DA9E20BE-027B-4470-8104-9CAC4A76154B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{3F21A595-D7B8-43C2-A03C-7CB57032328F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F21A595-D7B8-43C2-A03C-7CB57032328F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F21A595-D7B8-43C2-A03C-7CB57032328F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA9E20BE-027B-4470-8104-9CAC4A76154B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA9E20BE-027B-4470-8104-9CAC4A76154B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA9E20BE-027B-4470-8104-9CAC4A76154B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA9E20BE-027B-4470-8104-9CAC4A76154B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
